@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Melrose Labs Conversations SMPP/WS JS </title>
+	<meta name="description" content="Conversational multi-chat SMS text messaging user interface using SMPP over Web Sockets and JavaScript" />
+	
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+	
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+
+	<script src="ml_smpp_client_ws.js"></script>
+	<script src="ml_conversations.js"></script>
+	
+	<style>
+		body {margin:25px;}
+		.card-body {
+			min-height: 160px;
+			max-height: 160px;
+			overflow-y: auto;
+		}
+		.chat-balloon {
+			margin-bottom: 2px;
+		}
+		.chat-time {
+			font-size:75%;
+		}
+	</style>
+</head>
+<body>
+
+	<section>
+	
+		<h1><a href="https://melroselabs.com"><img src="https://melroselabs.com/assets/images/MelroseLabsLogo202007.svg" width="148" class="" alt="Melrose Labs"></a> ml-conversations-smpp-js</h1>
+		<p class="lead">Conversational multi-chat SMS text messaging user interface using SMPP over Web Sockets and JavaScript</p>
+
+	</section>
+	
+	<!-- -->
+	
+	<div class="row">
+	
+		<div class="col-3">
+		
+			<!-- SMPP account details -->
+		
+			<h2 class="h4">Account</h2>
+		
+			<div class="px-3 py-3 mb-3 bg-light">
+				<form autocomplete="off" class="needs-validation my-0" novalidate>
+		
+					<div class="collapse show" id="accountDetailsPane">
+					
+						<div class="mb-3">
+							<label for="inputSystemID" class="form-label">System ID</label>
+							<input type="text" required class="form-control" id="inputSystemID" aria-describedby="systemIDHelp" value="">
+							<!--<div id="systemIDHelp" class="form-text">SMPP account system ID</div>-->
+						</div>
+	
+						<div class="mb-3">
+							<label for="inputPassword" class="form-label">Password</label>
+							<input type="password" required class="form-control" id="inputPassword" aria-describedby="passwordHelp" value="">
+							<!--<div id="passwordHelp" class="form-text">SMPP account password</div>-->
+						</div>
+	
+						<div class="mb-3">
+							<label for="sourceAddress" class="form-label">Virtual Mobile Number / Shortcode</label>
+							<input type="text" required class="form-control" id="sourceAddress" aria-describedby="sourceAddressHelp" value="">
+							<!--<div id="sourceAddressHelp" class="form-text">Conversation mobile number</div>-->
+						</div>
+
+					</div>
+						
+					<div class="mb-3">
+						<button id="connect" type="button" class="btn btn-primary">Connect</button>
+						<button id="disconnect" type="button" class="btn btn-primary" disabled>Disconnect</button>
+					</div>
+
+					<div class="py-auto">
+						<h5 class="mb-0 text-right">Status</h5>
+						<span id="statusbound" class="text-right">-</span>
+					</div>
+
+				</form>
+			</div>
+
+			<h2 class="h4">Start conversation</h2>
+			
+			<div class="px-3 py-3 mb-3 bg-light">
+				<form autocomplete="off" class="needs-validation my-0" novalidate>
+
+					<div class="mb-3">
+						<label for="inputNewName" class="form-label">Customer name</label>
+						<input type="text" required class="form-control" id="inputNewName" aria-describedby="newNameHelp" value="" placeholder="Name">
+						<!--<div id="newNameHelp" class="form-text">Customer name</div>-->
+					</div>
+
+					<div class="mb-3">
+						<label for="inputNewDestination" class="form-label">Customer mobile number</label>
+						<input onkeyup="startConvKeyPress(this)" type="tel" required class="form-control" id="inputNewDestination" aria-describedby="newDestinationHelp" value="" placeholder="+44...">
+						<!--<div id="newDestinationHelp" class="form-text">Customer mobile number</div>-->
+					</div>
+
+					<div class="mb-3">
+						<button id="startconversation" type="button" class="btn btn-primary" disabled>Start</button>
+						<button id="startconversation_simulateinbound" type="button" class="btn btn-primary btn-sm">Simulator Inbound Start</button>
+					</div>
+
+				</form>
+			</div>
+			
+			<h2 class="h4">Conversations</h2>
+			
+			<div class="px-3 py-3 mb-3 bg-light">
+				<ul class="list-group" id="conversationsList">
+				</li>
+			</div>
+			
+		</div> <!-- col-3 -->
+		
+		<div class="col-9">
+	
+			<!-- chat panel -->
+		
+			<h2 class="h4">Chat panel</h2>
+		
+			<div class="px-3 py-3 mb-3 bg-light">
+		
+				<div class="row row-cols-1 row-cols-md-4 g-4" id="chatPanel">
+				
+					<!-- chat cards -->
+					<!-- -->
+				
+				</div>
+		
+			</div>
+		
+			<!-- chat panel (end) -->
+		
+		</div> <!-- col-9 -->
+	
+	</div>
+
+	<!-- log area -->
+
+	<h2 class="h4 mt-3">Log</h2>
+
+	<div class="row mb-1">
+		<div class="col-12">
+			<div style="border-radius: 15px 15px 15px 15px;" class="bg-light px-3 pt-1 pb-0 mt-2 mb-1">
+				<div class="text-end mt-2">
+					<button id="logclear" type="button" class="btn btn-secondary btn-sm">Clear</button>
+				</div>
+				<div id="message-area" style="height: 175px; overflow: scroll;"></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- JavaScript Bundle with Popper -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+
+</body>
+</html>
