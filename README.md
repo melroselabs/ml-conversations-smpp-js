@@ -11,6 +11,8 @@ Example conversational UI comprising:
 - Inbound (MO) and outbound (MT) SMS
 - Delivery confirmation (using delivery receipts)
 
+Uses SMPP accounts for the Melrose Labs Tyr SMS Gateway (https://melroselabs.com/services/tyr-sms-gateway/).  This is due to the code making a web sockets (WSS) connection to melroselabs.com and the web sockets proxy being configured to direct connections to Tyr SMS Gateway SMPP hosts.  Deploy your own web sockets proxy and update the code if you want to use another SMS gateway.
+
 This project is not intended as best practice in conversational UI design, however its purpose is to demonstrate how relatively simple it is to implement a conversational application and UI using web technologies, SMPP and a suitably capable SMS gateway provider.
 
 Further improvements are required to address robustness, message entry, connection stability/keep-alive, and chat management.
